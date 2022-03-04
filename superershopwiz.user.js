@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Superer Shop Wizard
-// @version      0.4
+// @version      0.5
 // @description  Improve SSW even more (for now? just output table for price only results)
 // @author       Will
 // @match        *://www.neopets.com/*
@@ -26,10 +26,13 @@
     }
 
     $( document ).ajaxSuccess(function( event, xhr, settings ) {
+        let SSWDATA = {};
+        let SSWVERSION = 0;
         // OLD SSW
         if ( settings.url.startsWith('/shops/ssw/ssw_query.php') ) {
+            SSWVERSION = 1;
             //console.log(settings);
-            let SSWDATA = JSON.parse(xhr.responseText);
+            SSWDATA = JSON.parse(xhr.responseText);
             //console.log(SSWDATA);
             if ( SSWDATA.req.type == '0' && SSWDATA.html && !SSWDATA.html.startsWith('<table') && SSWDATA.data.rowcount > 0 ) {
                 //console.log('price only');
@@ -45,7 +48,8 @@
         // NEW SSW
         else if ( settings.url.includes('/shops/ssw/ssw_query.php') ) {
             //console.log('used new ssw');
-            let SSWDATA = JSON.parse(xhr.responseText);
+            SSWVERSION = 2;
+            SSWDATA = JSON.parse(xhr.responseText);
             //console.log(SSWDATA);
             if ( SSWDATA.req.type == '0' && SSWDATA.html && SSWDATA.html.includes('ssw-result-priceonly') && SSWDATA.data.rowcount > 0 ) {
                 //console.log('price only');
@@ -60,6 +64,19 @@
                 }
                 html += '</ul></div>';
                 $('#sswresults').html(html);
+            }
+        }
+
+        if (SSWDATA.req.oii != '0') {
+            let search_for = $('div#search_for').text();
+            switch (SSWVERSION) {
+                case 1:
+                    $('div#search_for').html(`${search_for} (${SSWDATA.req.oii})`);
+                    break;
+                case 2:
+                default:
+                    $('div#search_for').html(`<p>${search_for} (${SSWDATA.req.oii})</p>`);
+                    break;
             }
         }
     });
