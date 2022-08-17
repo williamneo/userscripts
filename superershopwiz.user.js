@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Superer Shop Wizard
-// @version      0.5
+// @version      0.6
 // @description  Improve SSW even more (for now? just output table for price only results)
 // @author       Will
 // @match        *://www.neopets.com/*
@@ -67,7 +67,7 @@
             }
         }
 
-        if (SSWDATA.req.oii != '0') {
+        if (SSWVERSION != 0 && SSWDATA.req.oii != '0') {
             let search_for = $('div#search_for').text();
             switch (SSWVERSION) {
                 case 1:
